@@ -10,13 +10,13 @@
 </head>
 <body>
   <div class="container">
-    <nav class="navbar navbar-dark bg-secondary">
+    <nav class="navbar navbar-dark bg-secondary mb-3">
       <div class="container-fluid">
         <span class="navbar-brand mb-0 h1">👾 Game of Life Visualizer</span>
       </div>
     </nav>
 
-    <div id="app" class="mt-2 mb-5">
+    <div id="app" class="mb-5">
       <div class="row">
         <div class="col text-center">
           <svg v-bind:width="canvasWidth" v-bind:height="canvasHeight" v-bind:viewBox="canvasViewBox" xmlns="http://www.w3.org/2000/svg">
@@ -74,9 +74,19 @@
 
         <div class="col col-7">
           <div class="row">
-            <div class="col col-12">
+            <div class="col col-12 mb-3">
               <label for="dataJSON" class="form-label">Data</label><br>
               <textarea class="form-control form-control-sm" id="dataJSON" v-model="frameData" rows="15"></textarea>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col col-9 mb-3">
+              <h4>Samples Data</h4>
+
+              <div class="list-group">
+                <a v-for="pattern in samplePatterns" href="#" class="list-group-item list-group-item-action" v-on:click="setPattern(pattern)">{{pattern.name}}</a>
+              </div>
             </div>
           </div>
         </div>
@@ -86,16 +96,43 @@
   </div>
 
   <script>
+    const samplePatterns = [
+      {
+        name: 'Blinker',
+        data: `[
+  [ {"x":2,"y":1}, {"x":2,"y":2}, {"x":2,"y":3} ],
+  [ {"x":1,"y":2}, {"x":2,"y":2}, {"x":3,"y":2} ]
+]`
+      }
+    ,
+      {
+        name: 'Glider',
+        data: `[
+  [ {"x":2,"y":1}, {"x":3,"y":2}, {"x":1,"y":3}, {"x":2,"y":3}, {"x":3,"y":3} ],
+  [ {"x":1,"y":2}, {"x":3,"y":2}, {"x":2,"y":3}, {"x":3,"y":3}, {"x":2,"y":4} ],
+  [ {"x":1,"y":3}, {"x":3,"y":2}, {"x":3,"y":3}, {"x":2,"y":4}, {"x":3,"y":4} ],
+  [ {"x":2,"y":2}, {"x":2,"y":4}, {"x":3,"y":3}, {"x":4,"y":3}, {"x":3,"y":4} ],
+  [ {"x":3,"y":2}, {"x":2,"y":4}, {"x":3,"y":4}, {"x":4,"y":3}, {"x":4,"y":4} ],
+  [ {"x":2,"y":3}, {"x":4,"y":3}, {"x":3,"y":4}, {"x":3,"y":5}, {"x":4,"y":4} ],
+  [ {"x":2,"y":4}, {"x":4,"y":3}, {"x":4,"y":4}, {"x":3,"y":5}, {"x":4,"y":5} ],
+  [ {"x":3,"y":3}, {"x":3,"y":5}, {"x":4,"y":4}, {"x":5,"y":4}, {"x":4,"y":5} ],
+  [ {"x":4,"y":3}, {"x":3,"y":5}, {"x":4,"y":5}, {"x":5,"y":4}, {"x":5,"y":5} ],
+  [ {"x":3,"y":4}, {"x":5,"y":4}, {"x":4,"y":5}, {"x":4,"y":6}, {"x":5,"y":5} ]
+]`
+      }
+    ]
+
     const app = new Vue({
       el: '#app',
       data: {
-        frameData: '[]',
+        frameData: samplePatterns[0].data,
         tick: 0,
         shouldPlay: false,
         totalCols: 60,
         totalRow: 30,
         animationTimeout: 700,
-        blockSize: 10
+        blockSize: 10,
+        samplePatterns: samplePatterns
       },
       computed: {
         canvasViewBox: function() {
@@ -181,6 +218,9 @@
               parent.playFrames()
             }
           }, this.animationTimeout)
+        },
+        setPattern: function(pattern) {
+          this.frameData = pattern.data
         }
       }
     })
