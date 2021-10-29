@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <title>👾 Game of Life Visualizer</title>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+</head>
+<body>
+  <div class="container">
+    <nav class="navbar navbar-dark bg-secondary">
+      <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1">👾 Game of Life Visualizer</span>
+      </div>
+    </nav>
+
+    <div id="app" class="mt-2 mb-5">
+      <div class="row">
+        <div class="col text-center">
+          <svg v-bind:width="canvasWidth" v-bind:height="canvasHeight" v-bind:viewBox="canvasViewBox" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="Pattern" x="0" y="0" v-bind:width="blockSize" v-bind:height="blockSize" patternUnits="userSpaceOnUse">
+                <rect x="0" y="0" v-bind:width="blockSize" v-bind:height="blockSize" stroke="#ccc" stroke-width="1" stroke-opacity="0.8" fill="#efefef"/>
+              </pattern>
+            </defs>
+
+            <rect width="100%" height="100%" fill="url(#Pattern)" />
+            <rect v-for="cell in grid()" v-bind:x="cell.x" v-bind:y="cell.y" v-bind:width="blockSize" v-bind:height="blockSize" stroke="white" stroke-width="1" stroke-opacity="0.8" />
+          </svg>
+        </div>
+      </div>
+      <hr>
+      <div class="row">
+        <div class="col col-5">
+          <div class="row">
+            <div class="col col-5 mb-3">
+              <label for="frameNumber" class="form-label">Frame</label>
+              <div class="input-group input-group-sm">
+                <input type="number" class="form-control form-control-sm" id="frameNumber" v-model="tick" min="0" v-bind:max="(frames.length - 1)" >
+                <span class="input-group-text">/ {{totalFrames}}</span>
+              </div>
+            </div>
+            <div class="col col-6 mb-3">
+              <label for="animationSpeed" class="form-label">Animation Speed (ms per frame)</label>
+              <input type="number" class="form-control form-control-sm" id="animationSpeed" v-model="animationTimeout" >
+            </div>
+          </div>
+          <div class="row">
+            <div class="col col-5 mb-3">
+              <button class="btn btn-secondary" v-on:click="prevFrame">&laquo;</button>
+              <button class="btn btn-secondary" v-on:click="nextFrame">&raquo;</button>
+            </div>
+            <div class="col col-6 mb-3">
+              <button v-bind:class="playButtonClass" v-on:click="toggleAnimation">{{playButtonLabel}}</button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col col-4 mb-3">
+              <label for="canvasWidth" class="form-label">Total Columns</label>
+              <input type="number" class="form-control form-control-sm" id="canvasWidth" v-model="totalCols" >
+            </div>
+            <div class="col col-4 mb-3">
+              <label for="canvasHeight" class="form-label">Total Rows</label>
+              <input type="number" class="form-control form-control-sm" id="canvasHeight" v-model="totalRow" >
+            </div>
+            <div class="col col-4 mb-3">
+              <label for="blockSize" class="form-label">Block Size</label>
+              <input type="number" class="form-control form-control-sm" id="blockSize" v-model="blockSize" >
+            </div>
+          </div>
+        </div>
+
+        <div class="col col-7">
+          <div class="row">
+            <div class="col col-12">
+              <label for="dataJSON" class="form-label">Data</label><br>
+              <textarea class="form-control form-control-sm" id="dataJSON" v-model="frameData" rows="15"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr>
+    </div>
+  </div>
+
+  <script>
+    const app = new Vue({
+      el: '#app',
+      data: {
+        frameData: '[]',
+        tick: 0,
+        shouldPlay: false,
+        totalCols: 60,
+        totalRow: 30,
+        animationTimeout: 700,
+        blockSize: 10
+      },
+      computed: {
+        canvasViewBox: function() {
+          return `0 0 ${this.canvasWidth} ${this.canvasHeight}`
+        },
+        frames: function() {
+          try {
+            const parsedFrames = eval(this.frameData)
+
+            if (typeof parsedFrames !== 'object') {
+              return []
+            }
+            return parsedFrames
+          } catch (error) {
+            return []
+          }
+        },
+        canvasWidth: function() {
+          return this.totalCols * this.blockSize
+        },
+        canvasHeight: function() {
+          return this.totalRow * this.blockSize
+        },
+        totalFrames: function() {
+          return this.frames.length
+        },
+        playButtonClass: function() {
+          return this.shouldPlay ? 'btn btn-danger' : 'btn btn-primary'
+        },
+        playButtonLabel: function() {
+          return this.shouldPlay ? 'Stop Animation' : 'Start Animation'
+        }
+      },
+      methods: {
+        grid: function() {
+          if (this.frames.length > 0) {
+            const parent = this
+            return this.frames[this.tick].map(cell => {
+              const realX = cell.x * parent.blockSize
+              const realY = cell.y * parent.blockSize
+
+              if ((realX + parent.blockSize) >= parent.canvasWidth) {
+                parent.canvasWidth = realX + parent.blockSize
+              }
+
+              if ((realY + parent.blockSize) >= parent.canvasHeight) {
+                parent.canvasHeight = realY + parent.blockSize
+              }
+
+              return { x: realX, y: realY }
+            })
+          } else {
+            return []
+          }
+        },
+        prevFrame: function() {
+          if (this.tick > 0) {
+            this.tick--;
+          } else {
+            this.tick = this.frames.length - 1
+          }
+        },
+        nextFrame: function() {
+          if ((this.tick + 1) < this.frames.length) {
+            this.tick++;
+          } else {
+            this.tick = 0
+          }
+        },
+        toggleAnimation: function() {
+          if (this.shouldPlay === false) {
+            this.shouldPlay = true
+            this.playFrames()
+          } else {
+            this.shouldPlay = false
+          }
+        },
+        playFrames: function() {
+          const parent = this
+          setTimeout(function(){
+            parent.nextFrame()
+            if (parent.shouldPlay) {
+              parent.playFrames()
+            }
+          }, this.animationTimeout)
+        }
+      }
+    })
+  </script>
+</body>
+</html>
