@@ -40,7 +40,7 @@
                 <div class="col-sm-12 mb-3">
                   <label for="frameNumber" class="form-label">Frame</label>
                   <div class="input-group input-group-sm">
-                    <input type="number" class="form-control form-control-sm" id="frameNumber" v-model="tick" min="0" v-bind:max="(frames.length - 1)" >
+                    <input type="number" class="form-control form-control-sm" id="frameNumber" v-model="tick" min="1" v-bind:max="frames.length" >
                     <span class="input-group-text">/ {{totalFrames}}</span>
                   </div>
                 </div>
@@ -144,7 +144,7 @@
       el: '#app',
       data: {
         frameData: samplePatterns[0].data,
-        tick: 0,
+        tick: 1,
         shouldPlay: false,
         totalCols: 60,
         totalRow: 30,
@@ -153,6 +153,9 @@
         samplePatterns: samplePatterns
       },
       computed: {
+        generation: function() {
+          return (this.tick - 1)
+        },
         canvasViewBox: function() {
           return `0 0 ${this.canvasWidth} ${this.canvasHeight}`
         },
@@ -188,7 +191,7 @@
         grid: function() {
           if (this.frames.length > 0) {
             const parent = this
-            return this.frames[this.tick].map(cell => {
+            return this.frames[this.generation].map(cell => {
               const realX = cell.x * parent.blockSize
               const realY = cell.y * parent.blockSize
 
@@ -207,17 +210,17 @@
           }
         },
         prevFrame: function() {
-          if (this.tick > 0) {
+          if (this.tick > 1) {
             this.tick--;
           } else {
-            this.tick = this.frames.length - 1
+            this.tick = this.frames.length
           }
         },
         nextFrame: function() {
-          if ((this.tick + 1) < this.frames.length) {
+          if (this.tick < this.frames.length) {
             this.tick++;
           } else {
-            this.tick = 0
+            this.tick = 1
           }
         },
         toggleAnimation: function() {
