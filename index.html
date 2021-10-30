@@ -33,55 +33,66 @@
       </div>
       <hr>
       <div class="row">
-        <div class="col col-5">
+        <div class="col-sm-12 col-md-5">
           <div class="row">
-            <div class="col col-5 mb-3">
-              <label for="frameNumber" class="form-label">Frame</label>
-              <div class="input-group input-group-sm">
-                <input type="number" class="form-control form-control-sm" id="frameNumber" v-model="tick" min="0" v-bind:max="(frames.length - 1)" >
-                <span class="input-group-text">/ {{totalFrames}}</span>
+            <div class="col-sm-12 col-md-5">
+              <div class="row">
+                <div class="col-sm-12 mb-3">
+                  <label for="frameNumber" class="form-label">Frame</label>
+                  <div class="input-group input-group-sm">
+                    <input type="number" class="form-control form-control-sm" id="frameNumber" v-model="tick" min="0" v-bind:max="(frames.length - 1)" >
+                    <span class="input-group-text">/ {{totalFrames}}</span>
+                  </div>
+                </div>
+                <div class="col-sm-12 mb-3">
+                  <button class="btn btn-secondary" v-on:click="prevFrame">&laquo;</button>
+                  <button class="btn btn-secondary" v-on:click="nextFrame">&raquo;</button>
+                </div>
               </div>
             </div>
-            <div class="col col-6 mb-3">
-              <label for="animationSpeed" class="form-label">Animation Speed (ms per frame)</label>
-              <input type="number" class="form-control form-control-sm" id="animationSpeed" v-model="animationTimeout" >
+
+            <div class="col-sm-12 col-md-6">
+              <div class="row">
+                <div class="col-sm-12 mb-3">
+                  <label for="animationSpeed" class="form-label">Animation Speed</label>
+                  <div class="input-group input-group-sm">
+                    <input type="number" class="form-control form-control-sm" id="animationSpeed" v-model="animationTimeout" >
+                    <span class="input-group-text">ms</span>
+                  </div>
+                </div>
+                <div class="col-sm-12 mb-3">
+                  <button v-bind:class="playButtonClass" v-on:click="toggleAnimation">{{playButtonLabel}}</button>
+                </div>
+              </div>
             </div>
           </div>
+
           <div class="row">
-            <div class="col col-5 mb-3">
-              <button class="btn btn-secondary" v-on:click="prevFrame">&laquo;</button>
-              <button class="btn btn-secondary" v-on:click="nextFrame">&raquo;</button>
-            </div>
-            <div class="col col-6 mb-3">
-              <button v-bind:class="playButtonClass" v-on:click="toggleAnimation">{{playButtonLabel}}</button>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col col-4 mb-3">
+            <div class="col-sm-6 col-md-4 mb-3">
               <label for="canvasWidth" class="form-label">Total Columns</label>
               <input type="number" class="form-control form-control-sm" id="canvasWidth" v-model="totalCols" >
             </div>
-            <div class="col col-4 mb-3">
+            <div class="col-sm-6 col-md-4 mb-3">
               <label for="canvasHeight" class="form-label">Total Rows</label>
               <input type="number" class="form-control form-control-sm" id="canvasHeight" v-model="totalRow" >
             </div>
-            <div class="col col-4 mb-3">
+            <div class="col-sm-6 col-md-4 mb-3">
               <label for="blockSize" class="form-label">Block Size</label>
               <input type="number" class="form-control form-control-sm" id="blockSize" v-model="blockSize" >
             </div>
           </div>
         </div>
 
-        <div class="col col-7">
+        <div class="col-sm-12 col-md-7">
           <div class="row">
-            <div class="col col-12 mb-3">
+            <div class="col-sm-12 mb-3">
               <label for="dataJSON" class="form-label">Data</label><br>
               <textarea class="form-control form-control-sm" id="dataJSON" v-model="frameData" rows="15"></textarea>
             </div>
           </div>
 
           <div class="row">
-            <div class="col col-9 mb-3">
+            <div class="col-sm-12 col-md-9 mb-3">
               <h4>Sample Data</h4>
 
               <div class="list-group">
